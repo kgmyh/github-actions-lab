@@ -4,6 +4,36 @@
 
 이후 실습 순서는 ② Python API + 서버 배포, ③ Docker + 서버 배포입니다. 이 폴더는 첫 번째 실습만 담고 있습니다.
 
+설명은 한국어로 작성하고, GitHub에서 찾을 메뉴·버튼 이름은 **Actions**, **Pull requests**, **Create pull request**처럼 사이트의 영어 표기를 사용합니다.
+
+CI와 CD의 의미, ci-cd.yml의 구조·문법, 필요한 이론과 설정은 [CI/CD와 GitHub Actions 학습 가이드](docs/CI-CD-GUIDE.md)에 정리했습니다. 이 README는 따라 하는 실습 순서이고, 학습 가이드는 각 단계가 작동하는 이유를 설명합니다.
+
+## 세 가지 실습 방식과 진행 순서
+
+처음 제안한 방식 표는 CI/CD를 배우는 세 가지 방법을 비교한 것입니다. 모두 GitHub Actions를 사용하며, 만드는 앱과 배포 방법이 다릅니다. 이번에는 세 가지를 아래 순서로 실습합니다.
+
+| 순서 | 실습 방식 | 배울 내용 |
+|---|---|---|
+| ① 현재 실습 | JavaScript + GitHub Pages | 웹앱 자동 테스트·빌드·배포 |
+| ② 다음 실습 | Python API + 서버 배포 | 백엔드 API 자동 테스트·배포 |
+| ③ 마지막 실습 | Docker + 서버 배포 | 앱 컨테이너 생성·배포 |
+
+첫 실습은 별도 서버 운영 없이 배포 결과를 브라우저에서 확인하는 구성입니다.
+
+## GitHub Pages는 무엇인가요?
+
+GitHub Pages는 GitHub 저장소의 HTML, CSS, JavaScript 파일을 웹사이트로 공개하는 **정적 웹사이트 호스팅 서비스**입니다. 공개 저장소에서는 GitHub Free로 사용할 수 있습니다. Python이나 Node.js 백엔드 서버를 실행하려면 별도 호스팅이 필요합니다. [공식 설명](https://docs.github.com/en/pages/getting-started-with-github-pages/what-is-github-pages)
+
+아래 표는 첫 실습에서 함께 사용하는 서비스들의 역할을 설명합니다.
+
+| 서비스 | 역할 |
+|---|---|
+| GitHub 저장소 | 앱의 소스 코드 보관 |
+| GitHub Actions | 코드 변경 시 테스트·빌드·배포 자동 실행 |
+| GitHub Pages | 배포된 웹사이트를 사용자가 접속할 수 있도록 제공 |
+
+실습 흐름은 **코드 변경 → push → Actions에서 테스트와 빌드 → 성공한 main 빌드를 Pages에 배포 → 브라우저에서 확인**입니다. 2단계에서는 CI부터 실행하고, Pages 배포는 5단계에서 추가합니다.
+
 ## 준비된 것
 
 - 원 단위 팁 계산기: 10,000원 × 10% → 팁 1,000원, 총액 11,000원.
@@ -102,7 +132,15 @@ HTTPS push 인증은 GitHub 계정 비밀번호를 사용하지 않습니다. �
 
 ### 2-3. 실행 결과 찾기
 
-GitHub 저장소 → **Actions** → **CI/CD Lab** → 최신 실행 → **Test and build**를 엽니다.
+**Test and build는 workflow 실행 상세 화면에 표시되는 작업(Job) 이름입니다.** Actions의 실행 목록에서 한 단계 더 들어가야 보입니다.
+
+1. GitHub 저장소 상단 **Actions**를 클릭합니다.
+2. 왼쪽 **Workflows** 목록에서 **CI/CD Lab**을 선택합니다.
+3. 실행 목록에서 최신 실행의 **제목**을 클릭합니다. 예: chore: start GitHub Actions lab. 제목은 본인이 작성한 commit 메시지에 따라 달라집니다. 아래의 commit 번호 링크 대신 실행 제목을 클릭합니다.
+4. 실행 상세 화면에서 **Test and build**를 클릭합니다.
+5. **Run tests**를 펼치면 테스트 결과를, **Build website**를 펼치면 빌드 로그를 확인할 수 있습니다.
+
+실행 목록의 초록색 ✓는 해당 workflow 실행이 성공했다는 표시입니다.
 
 다음 step들이 순서대로 성공해야 합니다.
 
@@ -139,7 +177,23 @@ git commit -m "test: intentionally break tip calculation"
 git push -u origin practice/ci-failure
 ```
 
-GitHub 저장소 → Pull requests → New pull request에서 **base: main**, **compare: practice/ci-failure**로 PR을 만듭니다. Compare & pull request 버튼이 뜨면 그것을 사용해도 됩니다.
+### 3-1. 실패 실습용 PR 만들기
+
+위의 push까지 마쳤다면 GitHub에서 다음 순서로 PR을 만듭니다.
+
+1. 저장소 상단 **Pull requests**를 클릭합니다.
+2. **New pull request**를 클릭합니다.
+3. **Compare changes** 화면에서 왼쪽은 **base: main**, 오른쪽은 **compare: practice/ci-failure**로 선택합니다.
+4. 아래에 계산 코드의 변경 내용이 나타나면 **Create pull request**를 클릭합니다.
+5. 다음 화면에서 제목과 설명을 확인하고 **Create pull request**를 한 번 더 클릭합니다.
+
+**base**는 변경을 합칠 대상이고, **compare**는 변경한 코드가 있는 브랜치입니다. 따라서 이 PR은 practice/ci-failure의 변경을 main에 합치기 위한 요청입니다.
+
+base와 compare가 모두 main이면 같은 브랜치를 비교하므로 **Create pull request** 버튼이 비활성화됩니다. 이때는 오른쪽 **compare**를 practice/ci-failure로 바꾸세요. 목록에 해당 브랜치가 없다면 git push가 성공했는지 확인합니다.
+
+저장소에 **Compare & pull request** 배너가 나타나면 그 버튼으로 시작해도 됩니다. 그 경우에도 base와 compare가 위의 값인지 확인하세요.
+
+### 3-2. 실패한 검사 확인하기
 
 PR에서 검사가 시작되고 실패합니다. Details 또는 Actions 실행으로 들어가 **Run tests** 로그를 확인합니다.
 
@@ -164,7 +218,19 @@ git commit -m "fix: restore correct tip calculation"
 git push
 ```
 
-같은 PR에 새 commit이 추가되고 검사가 자동 재실행됩니다. 성공한 최신 검사를 확인한 뒤 GitHub에서 **Merge pull request → Confirm merge**로 병합합니다. 비교하기 쉽도록 이 실습에서는 기본 merge 방식을 사용합니다.
+같은 PR에 새 commit이 추가되고 검사가 자동 재실행됩니다. 새 PR을 만들 필요 없이 기존 PR에서 수정 결과를 확인합니다.
+
+### 4-1. Merge pull request는 어디에 있나요?
+
+1. GitHub 저장소 상단 **Pull requests**를 클릭합니다.
+2. 3단계에서 만든 practice/ci-failure 브랜치의 PR을 엽니다.
+3. **Conversation** 탭에서 아래로 스크롤합니다.
+4. 최신 commit의 **Test and build** 검사가 성공했는지 확인합니다.
+5. **Merge pull request**를 클릭하고 이어서 **Confirm merge**를 클릭합니다.
+
+Merge pull request는 개별 PR의 Conversation 화면 아래쪽에 있습니다. 비교하기 쉽도록 이 실습에서는 기본 merge 방식을 사용합니다.
+
+### 4-2. 병합 후 로컬 main 맞추기
 
 main에도 push 이벤트가 발생하므로 CI가 다시 실행됩니다. 로컬 main을 최신 상태로 맞춥니다.
 
@@ -197,6 +263,36 @@ git push
 
 기존 CI 파일을 **교체**합니다. .github/workflows에 두 파일을 동시에 두면 중복 실행되므로 템플릿을 그 폴더에 추가 파일로 넣지 마세요. docs/workflows의 파일은 참고용이며 자동 실행되지 않습니다.
 
+### 5-3. git diff의 @@ 표시는 무엇인가요?
+
+git diff .github/workflows/ci-cd.yml 결과에서 다음과 같은 줄을 볼 수 있습니다. 실제 줄 번호와 길이는 파일 내용에 따라 달라집니다.
+
+```diff
+@@ -8,9 +7,15 @@ on:
+```
+
+이 줄은 **변경 구간의 위치와 길이**를 알려주는 표시입니다.
+
+| 부분 | 의미 |
+|---|---|
+| -8,9 | 수정 전 파일의 8번째 줄부터 9줄 구간 |
+| +7,15 | 수정 후 파일의 7번째 줄부터 15줄 구간 |
+| on: | 변경 구간을 이해하도록 Git이 붙인 주변 코드 문맥 |
+
+기존 9줄 구간이 수정 후 15줄 구간으로 바뀌었다는 뜻입니다. 이 길이에는 변경되지 않은 주변 코드도 포함되므로, 9줄을 삭제하고 15줄을 추가했다는 의미는 아닙니다.
+
+실제로 무엇이 바뀌었는지는 아래 코드 줄의 맨 앞 표시로 확인합니다.
+
+```diff
+ 그대로인 줄
+-삭제된 줄
++추가된 줄
+```
+
+여기서 on:은 GitHub Actions의 실행 조건을 정의하는 YAML 항목입니다. @@ 뒤의 on:은 문맥을 보여주는 텍스트이며, 실행 조건의 추가·삭제 여부는 아래의 실제 코드 변경으로 판단합니다.
+
+### 5-4. 배포 결과 확인하기
+
 Actions에서 다음 흐름을 확인합니다.
 
 ```text
@@ -226,11 +322,31 @@ git commit -m "feat: update calculator headline"
 git push -u origin practice/site-update
 ```
 
-GitHub에서 main 대상으로 PR을 만듭니다.
+### 6-1. main 대상으로 PR 만들기
+
+“main 대상으로 PR을 만든다”는 **practice/site-update의 변경을 main에 합치는 요청을 만든다**는 뜻입니다. 3단계의 실패 실습용 PR과 별개의 새 PR을 만듭니다.
+
+위의 push까지 마친 뒤 GitHub에서 다음 순서로 PR을 만듭니다. 메뉴와 버튼 이름은 GitHub의 영어 표기를 사용합니다.
+
+1. 저장소 상단 **Pull requests**를 클릭합니다.
+2. **New pull request**를 클릭합니다.
+3. 왼쪽 **base: main**을 선택합니다. 변경을 합칠 대상 브랜치입니다.
+4. 오른쪽 **compare**에서 **practice/site-update**를 선택합니다. 방금 수정하고 push한 브랜치입니다.
+5. 아래에 src/index.html의 제목 변경이 나타나는지 확인한 뒤 **Create pull request**를 클릭합니다.
+6. 다음 화면에서 제목을 확인합니다. 예: feat: update calculator headline. 설명은 필요하면 적습니다.
+7. **Create pull request**를 다시 클릭하면 PR 생성이 완료됩니다.
+
+저장소에 **Compare & pull request** 배너가 나타나면 그 버튼으로 시작해도 됩니다. 이 경우에도 **base: main**, **compare: practice/site-update**인지 확인합니다.
+
+compare 목록에 practice/site-update가 없다면 위의 git push가 성공했는지 확인하세요. base와 compare가 모두 main이면 변경 사항을 비교할 수 없습니다.
+
+### 6-2. PR 검사와 병합 후 배포 비교하기
+
+PR 생성 후 다음을 확인합니다.
 
 1. PR 검사: **Test and build 성공**, **Deploy to Pages skipped**를 확인합니다.
 2. 배포 사이트의 제목은 아직 **팁 계산기**입니다.
-3. PR을 병합합니다.
+3. PR의 **Conversation** 탭 아래로 이동해 **Merge pull request → Confirm merge**를 클릭합니다.
 4. main 실행에서 **Test and build → Deploy to Pages**가 성공할 때까지 기다립니다.
 5. 사이트를 새로고침합니다. 제목이 **한 끼 팁 계산기**로 바뀝니다.
 
