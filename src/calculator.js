@@ -1,5 +1,5 @@
 // 실습용: npm run lab:break / lab:fix가 이 상수만 변경합니다.
-const TIP_DIVISOR = 10;
+const TIP_DIVISOR = 100;
 
 export function calculateTip(bill, percent) {
   if (!Number.isInteger(bill) || bill < 0 || bill > 1_000_000_000) {
